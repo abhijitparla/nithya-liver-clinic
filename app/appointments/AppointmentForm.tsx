@@ -14,8 +14,8 @@ const AppointmentForm = () => {
           //Proceed to checkout button
         }
         <div className="max-w-lg">
-            <Label className="mb-1" value="Date of Appointment" />
-            <Datepicker />
+            <Label className="font-semibold" value="Date of Appointment" />
+            <Datepicker minDate={new Date()} maxDate={new Date(new Date().getTime()+(14*24*60*60*1000))} className="mt-1"/>
         </div>
         
         <TimeSlot />

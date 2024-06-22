@@ -3,6 +3,7 @@ import { Tabs } from "flowbite-react";
 import { HiAdjustments, HiClipboardList, HiUserCircle } from "react-icons/hi";
 import { MdDashboard } from "react-icons/md";
 import BookAppointment from "./BookAppointment";
+import NewComp from "./NewClass";
 
 export function Tabbie() {
   return (
@@ -14,6 +15,7 @@ export function Tabbie() {
         This is <span className="font-medium text-gray-800 dark:text-white">Dashboard tabs associated content</span>.
         Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to
         control the content visibility and styling.
+        <NewComp/>
       </Tabs.Item>
     </Tabs>
   );

@@ -16,7 +16,8 @@ const TimeSlot = () => {
         }
     }
   return (
-    <div className='flex mt-3'>
+    <div className='flex mt-5'>
+      <p className='mr-3 self-center font-semibold'>Select time slot for appointment:</p>
 <Popover
     aria-labelledby="default-popover"
     content={
@@ -30,8 +31,8 @@ const TimeSlot = () => {
             </div>
         </div> */}
         <div className='grid grid-cols-4 gap-2 p-1'>
-            <Button color="light" id="10:00" onClick={handleClick}>10:00</Button>
-            <Button color="light" id="10:30" onClick={handleClick}>10:30</Button>
+            <Button color="light" id="10:00" onClick={handleClick}>10:00 am </Button>
+            <Button color="light" id="10:30" onClick={handleClick}>10:30 am</Button>
             <Button color="light" onClick={handleClick}>11:00</Button>
             <Button color="light" onClick={handleClick}>11:30</Button>
             <Button color="light" onClick={handleClick}>12:00</Button>
@@ -45,6 +46,7 @@ const TimeSlot = () => {
   >
     <Button className=''>Select Time Slot</Button>
   </Popover>
+  time
   <div className='self-center ml-2 bg-slate-300 p-2 rounded-lg'>
      {time} AM
   </div>
