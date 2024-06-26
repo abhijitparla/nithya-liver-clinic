@@ -10,53 +10,64 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-
+import {z} from 'zod'
+import {FieldValues, useForm} from 'react-hook-form'
 export type StepFunction = {
     stepFunc: React.Dispatch<React.SetStateAction<number>>
 }
+const appoitnmentSchema = z.object({
+  name: z.string().min(1, {message:"Name cannot be empty"}),
+  email: z.string().email(),
+  mobile: z.number(),
+  dateOfAppointment: z.date(),
+  timeSlot: z.string(),
+  mode:z.string()
+})
 export default function AppointmentShad({stepFunc}:StepFunction) {
-    const handleSubmit = () => {
-        console.log("inside handle submit")
-        stepFunc(1)
-    }
+    const {register, formState: { errors, isSubmitting}, reset, handleSubmit} = useForm()
+    const onSubmit = (data: FieldValues) => {
+      console.log("inside submit ", data)
+    } 
   return (
+    
     <Card className="w-full max-w-md mx-auto mt-10">
       <CardHeader>
         <CardTitle>Book an Appointment</CardTitle>
         <CardDescription>Fill out the form to schedule your appointment.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <form  onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" placeholder="Enter your name" />
+            <Input {...register("name")} id="name" placeholder="Enter your name" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="Enter your email" />
+            <Input {...register("email")} id="email" type="email" placeholder="Enter your email" required />
           </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="phone">Phone</Label>
-          <Input id="phone" type="tel" placeholder="Enter your phone number" />
+          <Input {...register("mobile")} id="phone" type="tel" placeholder="Enter your phone number" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="date">Date</Label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal">
+              <Button {...register("dateOfAppointment")} variant="outline" className="w-full justify-start text-left font-normal">
                 <CalendarDaysIcon className="mr-1 h-4 w-4 -translate-x-1" />
                 Select a date
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" initialFocus />
+              <Calendar  mode="single" initialFocus />
             </PopoverContent>
           </Popover>
         </div>
         <div className="space-y-2">
           <Label htmlFor="time">Time</Label>
-          <Select>
+          <Select {...register("timeSlot")}>
             <SelectTrigger id="time">
               <SelectValue placeholder="Select a time slot" />
             </SelectTrigger>
@@ -73,12 +84,16 @@ export default function AppointmentShad({stepFunc}:StepFunction) {
             </SelectContent>
           </Select>
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button onClick={handleSubmit} className="w-full">
+        <div>
+        <Button type="submit" className="w-full mt-10">
           Book Appointment
         </Button>
-      </CardFooter>
+        </div>
+        </form>
+      </CardContent>
+      {/* <CardFooter>
+        
+      </CardFooter> */}
     </Card>
   )
 }
