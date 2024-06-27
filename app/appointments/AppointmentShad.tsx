@@ -26,7 +26,7 @@ const appoitnmentSchema = z.object({
 export default function AppointmentShad({stepFunc}:StepFunction) {
     const {register, formState: { errors, isSubmitting}, reset, handleSubmit} = useForm()
     const onSubmit = (data: FieldValues) => {
-      console.log("inside submit ", data)
+      console.log("inside submit zod fields", data)
     } 
   return (
     
@@ -44,7 +44,7 @@ export default function AppointmentShad({stepFunc}:StepFunction) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input {...register("email")} id="email" type="email" placeholder="Enter your email" required />
+            <Input {...register("email")} id="email" type="email" placeholder="Enter your email" />
           </div>
         </div>
         <div className="space-y-2">
