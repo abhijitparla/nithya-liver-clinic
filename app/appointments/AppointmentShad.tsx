@@ -11,15 +11,28 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { format } from "date-fns";
+
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "@radix-ui/react-icons";
 import {
   Select,
   SelectTrigger,
@@ -47,25 +60,27 @@ const appoitnmentSchema = z.object({
     .string({ message: "Please enter a valid phone number" })
     .min(10, { message: "Mobile number has to be 10 digits" })
     .max(10, { message: "Mobile number has to be 10 digit" }),
-    dateOfAppointment: z.string({message: "Please select a valid date of appointment"}).min(1, {message: "Date of appointment is mandatory"}),
-  timeSlot: z.string({ message: "Please select a suitable time slot"}).min(1, {message:"Time slot is mandatory"}),
-  mode:z.string({message: "Please select a mode of appointment"}).min(1, {message: "Mode of appointment is mandatory"})
+  dateOfAppointment: z.date({
+    message: "Please select a valid date of appointment",
+  }),
+  timeSlot: z
+    .string({ message: "Please select a suitable time slot" })
+    .min(1, { message: "Time slot is mandatory" }),
+  mode: z.enum(["online", "faceToFace"], {
+    message: "Please select a mode of appointment",
+  }),
 });
 // .refine(data => data.timeSlot.trim() !== "", {
 //   message: "time slot is mandatory",
 //   path:["timeSlot"]
 // })
 export default function AppointmentShad({ stepFunc }: StepFunction) {
-  const {
-    register,
-    formState: { errors, isSubmitting },
-    reset,
-    handleSubmit,
-  } = useForm({
+  const form = useForm<z.infer<typeof appoitnmentSchema>>({
     resolver: zodResolver(appoitnmentSchema),
+    //any default values you'd like to give
   });
-  const onSubmitZod = (data: FieldValues) => {
-    console.log("inside submit zod fields", data);
+  const onSubmitZod = (fromData: z.infer<typeof appoitnmentSchema>) => {
+    console.log("inside submit zod fields", fromData);
   };
   return (
     <Card className="w-full max-w-md mx-auto mt-10">
@@ -76,110 +91,168 @@ export default function AppointmentShad({ stepFunc }: StepFunction) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit(onSubmitZod)}>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                {...register("name")}
-                id="name"
-                placeholder="Enter your name"
-              />
-              {errors.name && (
-                <p style={{ color: "red" }}>{`${errors.name.message}`}</p>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmitZod)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter your full name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                {...register("email")}
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-              />
-              {errors.email && (
-                <p style={{ color: "red" }}>{`${errors.email.message}`}</p>
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter a valid email" {...field}></Input>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-          </div>
-          <div className="space-y-2 mt-3">
-            <Label htmlFor="mobile">Phone</Label>
-            <div className="flex">
-              <Input readOnly value="+91" className="w-14 mr-2" />
-              <Input
-                {...register("mobile")}
-                id="mobile"
-                type="number"
-                placeholder="Enter your phone number"
-              />
-            </div>
+            />
 
-            {errors.mobile && (
-              <p style={{ color: "red" }}>{`${errors.mobile.message}`}</p>
-            )}
-          </div>
-          <div className="space-y-2 mt-3">
-            <Label>Date of Appointment</Label>
-              <Datepicker {...register("dateOfAppointment")} ></Datepicker>
-              {errors.dateOfAppointment && <p style={{ color: "red" }}>{`${errors.dateOfAppointment.message}`}</p> }
-          </div>
-          {/* <div className="space-y-2 flex flex-col mt-2">
-          <Label htmlFor="date">Date</Label>
-          <div className="relative max-w-sm">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-              <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-              </svg>
-            </div>
-            <input id="default-datepicker" type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date" />
-          </div>
-          {errors.dob && <p style={{color: "red"}}>{`${errors.dob.message}`}</p>}
-        </div> */}
-          <div className="space-y-2 mt-3">
-            <Label >Time Slot</Label>
-            <Select>
-              <SelectTrigger id="timeSlot" >
-                <SelectValue
-                  placeholder="Select a time slot"
-                  {...register("timeSlot")}
-                />
-              </SelectTrigger>
-              <SelectContent >
-                <SelectItem value="9:00 AM">9:00 AM</SelectItem>
-                <SelectItem value="10:00 AM">10:00 AM</SelectItem>
-                <SelectItem value="11:00 AM">11:00 AM</SelectItem>
-                <SelectItem value="12:00 PM">12:00 PM</SelectItem>
-                <SelectItem value="1:00 PM">1:00 PM</SelectItem>
-                <SelectItem value="2:00 PM">2:00 PM</SelectItem>
-                <SelectItem value="3:00 PM">3:00 PM</SelectItem>
-                <SelectItem value="4:00 PM">4:00 PM</SelectItem>
-                <SelectItem value="5:00 PM">5:00 PM</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.timeSlot && (
-              <p style={{ color: "red" }}>{`${errors.timeSlot.message}`}</p>
-            )}
-          </div>
-          <div className="space-y-2 mt-3">
-            <Label>Mode of Appointment</Label>
-            <RadioGroup {...register("mode")}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="option-one" id="option-one" />
-                <Label htmlFor="option-one">Telephonic</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="option-two" id="option-two" />
-                <Label htmlFor="option-two">Face to Face</Label>
-              </div>
-            </RadioGroup>
-            {errors.mode && <p style={{color: "red"}}>{`${errors.mode.message}`}</p> }
-          </div>
-          <div>
-            <Button type="submit" className="w-full mt-10">
-              Book Appointment
-            </Button>
-          </div>
-        </form>
+            <FormField
+              control={form.control}
+              name="mobile"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mobile No</FormLabel>
+                  <div className="flex ">
+                    <Input value={"+91"} readOnly className="w-1/6" />
+                    <FormControl>
+                      <Input
+                        placeholder="Enter a valid mobile number"
+                        type="number"
+                        {...field}
+                        className="w-5/6 ml-2"
+                      />
+                    </FormControl>
+                  </div>
+                  <FormDescription>An OTP will be sent to this number</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="dateOfAppointment"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Date of appointment</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date < new Date() || date > new Date(new Date().setDate(new Date().getDate() + 15))
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="timeSlot"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time Slot</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a suitable time slot" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="0900">9:00 am</SelectItem>
+                      <SelectItem value="1000">10:00 am</SelectItem>
+                      <SelectItem value="1100">11:00 am</SelectItem>
+                      <SelectItem value="1200">12:00 pm</SelectItem>
+                      <SelectItem value="1300">01:00 pm</SelectItem>
+                      <SelectItem value="1400">02:00 pm</SelectItem>
+                      <SelectItem value="1500">03:00 pm</SelectItem>
+                      <SelectItem value="1600">04:00 pm</SelectItem>
+                      <SelectItem value="1700">05:00 pm</SelectItem>
+                      <SelectItem value="1800">06:00 pm</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="mode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mode of appointment</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="online" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Telephonic Consultation
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="faceToFace" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Face to Face consultation
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">Submit</Button>
+          </form>
+        </Form>
       </CardContent>
       {/* <CardFooter>
         
