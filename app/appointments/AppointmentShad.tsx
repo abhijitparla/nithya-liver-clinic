@@ -3,6 +3,7 @@
  * @see https://v0.dev/t/4PG5BVKJokf
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
+'use client'
 import {
   Card,
   CardHeader,
@@ -46,6 +47,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DatePicker } from "./DatePicker";
 import { Datepicker } from "flowbite-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useState } from "react";
+import { OtpDialog } from "./OtpDialog";
 export type StepFunction = {
   stepFunc: React.Dispatch<React.SetStateAction<number>>;
 };
@@ -75,12 +78,15 @@ const appoitnmentSchema = z.object({
 //   path:["timeSlot"]
 // })
 export default function AppointmentShad({ stepFunc }: StepFunction) {
+  const [viewOTP, setViewOTP] = useState<boolean>(false)
   const form = useForm<z.infer<typeof appoitnmentSchema>>({
     resolver: zodResolver(appoitnmentSchema),
     //any default values you'd like to give
   });
   const onSubmitZod = (fromData: z.infer<typeof appoitnmentSchema>) => {
     console.log("inside submit zod fields", fromData);
+    setViewOTP(true)
+    return(<p>Hello</p>)
   };
   return (
     <Card className="w-full max-w-md mx-auto mt-10">
@@ -91,6 +97,7 @@ export default function AppointmentShad({ stepFunc }: StepFunction) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+      <OtpDialog status = {viewOTP}/>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmitZod)} className="space-y-8">
             <FormField
